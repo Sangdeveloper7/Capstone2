@@ -2,7 +2,7 @@ package com.thc.fallsprbasic.controller;
 
 import com.thc.fallsprbasic.dto.DefaultDto;
 import com.thc.fallsprbasic.dto.UserDto;
-import com.thc.fallsprbasic.exception.NoAuthException;
+import com.thc.fallsprbasic.exception.NoAuthorizationException;
 import com.thc.fallsprbasic.security.AuthService;
 import com.thc.fallsprbasic.security.ExternalProperties;
 import com.thc.fallsprbasic.service.UserService;
