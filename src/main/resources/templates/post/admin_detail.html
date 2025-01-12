@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <head th:replace="~{@{includes/admin/head}}"></head>
+</head>
+<body>
+
+<script id="list_info_postimg" type="text/x-handlebars-template">
+    {{#resultData_postimg}}
+    <div class="col-sm-3" id="div_post_imgs_{{order}}">
+        <img class="img-responsive" id="img_post_img_{{order}}" alt="" src="{{src}}" />
+        <div onclick="listener_delete_img('{{order}}')">삭제</div>
+    </div>
+    {{/resultData_postimg}}
+</script>
+<script type="text/javascript">
+    var list_info_postimg = $("#list_info_postimg").html();
+    var list_info_postimg_template = Handlebars.compile(list_info_postimg);
+</script>
+
+<div id="wrapper">
+    <body th:replace="~{@{includes/admin/nav}}"></body>
+    <script>
+        $(".sidemenu_li_post").addClass("active");
+    </script>
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <body th:replace="~{@{includes/admin/navbar_top}}"></body>
+        <div class="row wrapper border-bottom white-bg page-heading">
+            <div class="col-lg-10">
+                <h2>게시글 상세 : <font class="font_post_title">-</font></h2>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/admin">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/notice/admin_list">커뮤니티 관리</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/post/admin_list">게시글 목록</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        <strong>게시글 상세</strong>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-lg-2">
+            </div>
+        </div>
+
+        <div class="animated fadeInRight" style="padding-top:12.5px;padding-bottom:0px;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox-title">
+                        <h5>#<font class="font_post_id">-</font></h5>
+                    </div>
+                    <div class="ibox-content" style="padding-bottom:0.1px;">
+                        <input type="hidden" id="detail_post_id" value="" />
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">삭제여부</label>
+                            <div class="col-sm-4">
+                                <select class="form-control m-b" id="detail_post_deleted" keyword="deleted" onchange="update_post(this)">
+                                    <option value="false">일반</option>
+                                    <option value="true">삭제</option>
+                                </select>
+                            </div>
+                            <label class="col-sm-6"></label>
+
+                            <label class="col-sm-2 col-form-label">*제목</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="input_required form-control m-b" id="detail_post_title" keyword="title" placeholder="제목을 입력해주세요!" errormsg="필수값입니다." onchange="update_post(this)" />
+                            </div>
+                            <label class="col-sm-6"></label>
+
+                            <label class="col-sm-2 col-form-label">내용</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control m-b" id="detail_post_content" keyword="content" placeholder="비밀번호를 입력해주세요!" errormsg="필수값입니다." onchange="update_post(this)" ></textarea>
+                            </div>
+
+                            <label class="col-sm-2 col-form-label">
+                                대표사진
+                                <input class="hide" type="file" id="input_file" onchange="readInputFile(this)"/>
+                                <button class="btn btn-sm btn-default" onclick='$("#input_file").trigger("click")'>불러오기</button>
+                            </label>
+                            <div class="col-sm-10 row" id="div_post_imgs">
+                            </div>
+
+                            <div class="col-sm-2 hide">
+                                <img class="img-responsive" id="img_post_img" alt="" src="" />
+                            </div>
+                            <div class="col-sm-8 hide">
+                                <input type="text" class="form-control m-b" id="detail_post_img" keyword="img" placeholder="대표사진을 입력해주세요!" readonly="readonly" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var tempFile = null;
+            function readInputFile(input) {
+                if (input.files && input.files[0]) {
+                    let reader = new FileReader();
+                    reader.readAsDataURL(input.files[0]);
+                    reader.onload = function(e) {
+                        tempFile = input.files[0];
+                        createPostimg();
+                    }
+                }
+            }
+            function createPostimg() {
+
+                let _param = {
+                    'postId' : $("#detail_post_id").val()
+                };
+                let formData = new FormData();
+                formData.append('imgfile', tempFile);
+                formData.append('param', new Blob([JSON.stringify(_param)], {
+                    type: "application/json; charset=utf-8"
+                }));
+
+                $.ajax({
+                    url: "/api/postimg",
+                    type: "POST",
+                    contentType: false,
+                    data: formData,
+                    cache: false,
+                    processData : false,
+                    success: (obj_data, status, xhr)=>{
+                        let tList = [];
+                        let eachData = {};
+                        eachData["order"] = obj_data["id"];
+                        eachData["src"] = "/image/" + obj_data["url"];
+                        tList.push(eachData);
+                        $("#div_post_imgs").append(list_info_postimg_template({"resultData_postimg":tList}));
+                    },
+                    error: (obj_data, status, xhr)=>{
+                        alert("error!!");
+                        alert(JSON.stringify(obj_data));
+                    }
+                });
+            }
+        </script>
+        <script>
+            function listener_delete_img(obj_order){
+                let _param = {};
+                _param["id"] = obj_order;
+
+                let _data = new Map();
+                _data.url = "/api/postimg";
+                _data.type = "DELETE";
+                _data.param = _param;
+                _data.success = function(obj_data, obj_status, obj_xhr){
+                    $("#div_post_imgs_" + obj_order).remove();
+                }
+                _data.error = function(obj_data, obj_status, obj_xhr){
+                    alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+                }
+                func_ajax(_data);
+            }
+        </script>
+        <script>
+            $( document ).ready(function() {
+                console.log( "ready!" );
+                detail_post();
+            });
+
+            function detail_post(){
+                let postId = getIdFromUrl(null);
+                let _data = new Map();
+                _data.url = "/api/post";
+                _data.type = "GET";
+                _data.param = {'id':postId};
+                _data.success = function(obj_data, obj_status, obj_xhr){
+                    //alert(JSON.stringify(obj_data));
+                    let detailKeys = Object.keys(obj_data)
+                    for (let eachKey of detailKeys){
+                        $(".font_post_" + eachKey).text(obj_data[eachKey]);
+                        $("#detail_post_" + eachKey).val(obj_data[eachKey] + "");
+                        $("#img_post_" + eachKey).attr("src", "/image/" + obj_data[eachKey]);
+                    }
+
+                    let imgs = obj_data["imgs"];
+                    //alert(imgs.length);
+                    for(let each of imgs){
+                        let tList = [];
+                        let eachData = {};
+                        eachData["order"] = each["id"];
+                        eachData["src"] = "/image/" + each["url"];
+                        tList.push(eachData);
+                        $("#div_post_imgs").append(list_info_postimg_template({"resultData_postimg":tList}));
+                    }
+
+                }
+                _data.error = function(obj_data, obj_status, obj_xhr){
+                    alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+                }
+                func_ajax(_data);
+            }
+            function update_post(obj){
+                let _param = {};
+                _param["id"] = $("#detail_post_id").val();
+                if($(obj).attr("keyword") === "deleted"){
+                    _param[$(obj).attr("keyword")] = ($(obj).val() === "true");
+                } else {
+                    _param[$(obj).attr("keyword")] = $(obj).val();
+                }
+                //alert(_param[$(obj).attr("keyword")]);
+
+                let _data = new Map();
+                _data.url = "/api/post";
+                _data.type = "PUT";
+                _data.param = _param;
+                _data.success = function(obj_data, obj_status, obj_xhr){
+                    //alert("수정되었습니다.");
+                }
+                _data.error = function(obj_data, obj_status, obj_xhr){
+                    alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+                }
+                func_ajax(_data);
+            }
+        </script>
+        <body th:replace="~{@{includes/admin/footer}}"></body>
+    </div>
+    <body th:replace="~{@{includes/admin/right_sidebar}}"></body>
+</div>
+<body th:replace="~{@{includes/admin/bottom}}"></body>
+</body>
+</html>

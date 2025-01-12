@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Paper Details</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        h1 {
+            color: #343a40;
+        }
+        #search_container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #search_tbpaper_id {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #div_details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: none; /* Initially hidden */
+        }
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        .detail-item strong {
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+<h1>Search Paper Details</h1>
+<div id="search_container">
+    <label for="search_tbpaper_id">Search Paper Name:</label>
+    <input id="search_tbpaper_id" placeholder="Enter paper name" />
+    <button onclick="searchPaperDetail()">Search</button>
+</div>
+
+<div id="div_details">
+    <div class="detail-item"><strong>Paper Name:</strong> <span id="detail_id"></span></div>
+    <div class="detail-item"><strong>Content:</strong> <span id="detail_content"></span></div>
+    <div class="detail-item"><strong>Paper Type ID:</strong> <span id="detail_papertype_id"></span></div>
+</div>
+
+<script>
+    function searchPaperDetail() {
+        const id = $("#search_tbpaper_id").val(); // Get the input value
+        console.log("Searching for id:", id);
+
+        // AJAX request to fetch paper details
+        $.ajax({
+            url: `/api/tbpaper/detail`, // Detail API endpoint
+            type: "GET",
+            data: { id: id }, // Send id as a parameter
+            success: function(response) {
+                console.log("API Response:", response);
+
+                if (response) {
+                    // Populate the detail fields
+                    $("#detail_id").text(response.id);
+                    $("#detail_content").text(response.content);
+                    $("#detail_papertype_id").text(response.papertype_id);
+
+                    // Show the details container
+                    $("#div_details").show();
+                } else {
+                    // Handle no results found
+                    alert("No details found for the given paper name.");
+                    $("#div_details").hide();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching details:", error);
+                alert("An error occurred while fetching the details.");
+                $("#div_details").hide();
+            }
+        });
+    }
+</script>
+</body>
+</html>

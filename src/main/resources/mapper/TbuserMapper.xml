@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.fallsprbasic.mapper.TbuserMapper">
+
+	<!---->
+
+	<select id="detail" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.TbuserDto$DetailResDto">
+		SELECT tbuser.id
+			 , tbuser.deleted
+			 , tbuser.created_at as createdAt
+			 , tbuser.modified_at as modifiedAt
+			 , tbuser.password
+			 , tbuser.username
+		FROM tbuser
+		WHERE tbuser.id = #{id}
+	</select>
+
+
+	<select id="list" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.TbuserDto$DetailResDto">
+		SELECT tbuser.id
+		FROM tbuser
+		WHERE tbuser.id is not NULL
+		<if test = "deleted != null and deleted !=''">AND tbuser.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND tbuser.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= tbuser.created_at</if>
+		<if test = "username != null and usernamename !=''">AND tbuser.username LIKE CONCAT('%', #{username}, '%')</if>
+	</select>
+
+	<select id="pagedList" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.TbuserDto$DetailResDto">
+		SELECT tbuser.id
+		FROM tbuser
+		WHERE tbuser.id is not NULL
+		<if test = "deleted != null">AND tbuser.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND tbuser.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= tbuser.created_at</if>
+		<if test = "username != null and username !=''">AND tbuser.username LIKE CONCAT('%', #{username}, '%')</if>
+		<if test = "orderby != null and orderby =='created_at'">ORDER BY tbuser.created_at</if>
+		<if test = "orderby != null and orderby =='title'">ORDER BY tbuser.title </if>
+		<if test = "orderway != null and orderway =='desc'"> DESC</if>
+		<if test = "orderway != null and orderway =='asc'"> ASC</if>
+		LIMIT #{offset}, #{perpage}
+	</select>
+	<select id="pagedListCount" parameterType="hashMap" resultType="Integer">
+		SELECT count(tbuser.id) as listsize
+		FROM tbuser
+		WHERE tbuser.id is not NULL
+		<if test = "deleted != null">AND tbuser.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND tbuser.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= tbuser.created_at</if>
+		<if test = "username != null and username !=''">AND tbuser.username LIKE CONCAT('%', #{username}, '%')</if>
+	</select>
+
+	<select id="scrollList" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.TbuserDto$DetailResDto">
+		SELECT tbuser.id
+		FROM tbuser
+		WHERE tbuser.id is not NULL
+		<if test = "deleted != null">AND tbuser.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND tbuser.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= tbuser.created_at</if>
+		<if test = "username != null and username !=''">AND tbuser.username LIKE CONCAT('%', #{username}, '%')</if>
+		<if test = "orderway != null and orderway =='desc'">
+			<if test = "createdAt != null and createdAt !=''">AND #{createdAt} > tbuser.created_at</if>
+			ORDER BY tbuser.created_at DESC
+		</if>
+		<if test = "orderway != null and orderway =='asc'">
+			<if test = "createdAt != null and createdAt !=''">AND tbuser.created_at > #{createdAt}</if>
+			ORDER BY tbuser.created_at ASC
+		</if>
+		LIMIT 0, #{perpage}
+	</select>
+
+</mapper>
