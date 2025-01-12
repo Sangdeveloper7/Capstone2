@@ -13,7 +13,7 @@ LOGIN
 </div>
 
 *아이디
-<input type="text" class="input_required" id="create_user_username" placeholder="아이디를 입력해주세요!"/>
+<input type="text" class="input_required" id="create_user_email" placeholder="아이디를 입력해주세요!"/>
 *비번
 <input type="password" class="input_required" id="create_user_password" placeholder="비밀번호를 입력해주세요!"/>
 
@@ -37,7 +37,7 @@ LOGIN
             type: "POST",
             contentType : 'application/json; charset=utf-8',
             data: JSON.stringify({
-                username : $("#create_user_username").val()
+                email : $("#create_user_email").val()
                 ,password : $("#create_user_password").val()
             }),
             cache: false,
