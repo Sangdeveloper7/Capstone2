@@ -5,18 +5,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/notice")
+@RequestMapping("/dkeyword")
 @Controller
-public class NoticeController {
+public class DkeywordController {
 
     @GetMapping("/{page}")
     public String page(@PathVariable String page){
-        return "notice/" + page;
+        return "dkeyword/" + page;
     }
 
     @GetMapping("/{page}/{id}")
     public String page2(@PathVariable String page, @PathVariable String id){
-        return "notice/" + page;
+        return "dkeyword/" + page;
     }
 
 }

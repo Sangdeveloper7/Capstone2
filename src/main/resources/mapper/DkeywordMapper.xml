@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.fallsprbasic.mapper.DkeywordMapper">
+
+	<!---->
+
+	<select id="detail" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DkeywordDto$DetailResDto">
+		SELECT dkeyword.id
+			 , dkeyword.deleted
+			 , dkeyword.created_at as createdAt
+			 , dkeyword.modified_at as modifiedAt
+			 , dkeyword.keyword
+		FROM dkeyword
+		WHERE dkeyword.id = #{id}
+	</select>
+	<select id="list" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DkeywordDto$DetailResDto">
+		SELECT dkeyword.id
+		FROM dkeyword
+		WHERE dkeyword.id is not NULL
+		<if test = "deleted != null and deleted !=''">AND dkeyword.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND dkeyword.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= dkeyword.created_at</if>
+		<if test = "keyword != null and keyword !=''">AND dkeyword.keyword LIKE CONCAT('%', #{keyword}, '%')</if>
+	</select>
+
+	<select id="pagedList" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DkeywordDto$DetailResDto">
+		SELECT dkeyword.id
+		FROM dkeyword
+		WHERE dkeyword.id is not NULL
+		<if test = "deleted != null">AND dkeyword.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND dkeyword.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= dkeyword.created_at</if>
+		<if test = "keyword != null and keyword !=''">AND dkeyword.keyword LIKE CONCAT('%', #{keyword}, '%')</if>
+		<if test = "orderby != null and orderby =='created_at'">ORDER BY dkeyword.created_at</if>
+		<if test = "orderby != null and orderby =='keyword'">ORDER BY dkeyword.keyword </if>
+		<if test = "orderway != null and orderway =='desc'"> DESC</if>
+		<if test = "orderway != null and orderway =='asc'"> ASC</if>
+		LIMIT #{offset}, #{perpage}
+	</select>
+	<select id="pagedListCount" parameterType="hashMap" resultType="Integer">
+		SELECT count(dkeyword.id) as listsize
+		FROM dkeyword
+		WHERE dkeyword.id is not NULL
+		<if test = "deleted != null">AND dkeyword.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND dkeyword.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= dkeyword.created_at</if>
+		<if test = "keyword != null and keyword !=''">AND dkeyword.keyword LIKE CONCAT('%', #{keyword}, '%')</if>
+	</select>
+
+	<select id="scrollList" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DkeywordDto$DetailResDto">
+		SELECT dkeyword.id
+		FROM dkeyword
+		WHERE dkeyword.id is not NULL
+		<if test = "deleted != null">AND dkeyword.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND dkeyword.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= dkeyword.created_at</if>
+		<if test = "keyword != null and keyword !=''">AND dkeyword.keyword LIKE CONCAT('%', #{keyword}, '%')</if>
+		<if test = "orderway != null and orderway =='desc'">
+			<if test = "createdAt != null and createdAt !=''">AND #{createdAt} > dkeyword.created_at</if>
+			ORDER BY dkeyword.created_at DESC
+		</if>
+		<if test = "orderway != null and orderway =='asc'">
+			<if test = "createdAt != null and createdAt !=''">AND dkeyword.created_at > #{createdAt}</if>
+			ORDER BY dkeyword.created_at ASC
+		</if>
+		LIMIT 0, #{perpage}
+	</select>
+
+</mapper>
