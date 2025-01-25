@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document List</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+<h2>Document List</h2>
+
+검색어 : <input id="search_keyword" />
+<div id="div_list">
+</div>
+
+<button onclick="list_documents()">
+    문서 전체 목록 조회
+</button>
+
+<script>
+    function list_documents() {
+        $.ajax({
+            url: "/api/document/list",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            data: {
+                keyword: $("#search_keyword").val()
+            },
+            cache: false,
+            success: (obj_data, status, xhr) => {
+                $("#div_list").empty();
+                for (let each of obj_data) {
+                    $("#div_list").append(
+                        "<div>" +
+                        "<strong>문서 이름:</strong> <a href='" + each["docUrl"] + "' target='_blank'>" + each["docName"] + "</a><br/>" +
+                        "<strong>문서 내용:</strong> " + each["docContent"] + "<br/>" +
+                        "<strong>발급 방법:</strong> " + each["prepare"] + "<br/>" +
+                        "<hr/>" +
+                        "</div>"
+                    );
+                }
+            },
+            error: (obj_data, status, xhr) => {
+                alert("조회 중 에러 발생!");
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

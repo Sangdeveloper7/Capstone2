@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Keyword Detail</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+</head>
+<body>
+<h2>Keyword Detail</h2>
+
+<label for="detail_id">ID:</label>
+<input type="text" id="detail_id" readonly/>
+<br>
+<label for="detail_keyword">Keyword:</label>
+<input type="text" id="detail_keyword" />
+<br>
+<button onclick="update_keyword()">
+    수정
+</button>
+<button onclick="delete_keyword()">
+    삭제
+</button>
+
+<script>
+    // URL에서 ID 추출
+    let temp_url = window.location.href;
+    let split_temp_url = temp_url.split('/');
+    let final_id = split_temp_url[split_temp_url.length - 1];
+    let split_q = final_id.split("?");
+    if (split_q.length > 0) {
+        final_id = split_q[0];
+    }
+
+    $(document).ready(function () {
+        fetch_keyword_detail();
+    });
+
+    function fetch_keyword_detail() {
+        $.ajax({
+            url: "/api/dkeyword", // 컨트롤러의 detail 메서드 매핑
+            type: "GET",
+            data: {
+                id: final_id
+            },
+            cache: false,
+            success: (obj_data, status, xhr) => {
+                $("#detail_id").val(obj_data["id"]);
+                $("#detail_keyword").val(obj_data["keyword"]);
+            },
+            error: (obj_data, status, xhr) => {
+                alert("조회 중 에러 발생!");
+            }
+        });
+    }
+
+    function update_keyword() {
+        $.ajax({
+            url: "/api/dkeyword", // 컨트롤러의 update 메서드 매핑
+            type: "PUT",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                id: $("#detail_id").val(),
+                keyword: $("#detail_keyword").val()
+            }),
+            cache: false,
+            success: (obj_data, status, xhr) => {
+                alert("수정 성공!");
+            },
+            error: (obj_data, status, xhr) => {
+                alert("수정 중 에러 발생!");
+            }
+        });
+    }
+
+    function delete_keyword() {
+        $.ajax({
+            url: "/api/dkeyword", // 컨트롤러의 delete 메서드 매핑
+            type: "DELETE",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                id: $("#detail_id").val()
+            }),
+            cache: false,
+            success: (obj_data, status, xhr) => {
+                alert("삭제 성공!");
+                window.location.href = "/dkeyword/list"; // 삭제 후 목록 페이지로 리다이렉트
+            },
+            error: (obj_data, status, xhr) => {
+                alert("삭제 중 에러 발생!");
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
