@@ -1,305 +1,562 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>키워드 목록</title>-->
+
+<!--    &lt;!&ndash; Bootstrap, jQuery, Handlebars (CDN 예시) &ndash;&gt;-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">-->
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>-->
+
+<!--    <style>-->
+<!--        .cursor_pointer {-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--        .hide {-->
+<!--            display: none;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--&lt;!&ndash; Handlebars 템플릿 &ndash;&gt;-->
+<!--<script id="list_info_dkeyword" type="text/x-handlebars-template">-->
+<!--    {{#resultData_dkeyword}}-->
+<!--    <tr class="gradeA">-->
+<!--        <td>-->
+<!--            <input-->
+<!--                    class="input_chk_delete_each"-->
+<!--                    type="checkbox"-->
+<!--                    keyword="{{id}}"-->
+<!--                    id="input_chk_delete_each_{{id}}"-->
+<!--                    onclick="listener_chk_delete(this)"-->
+<!--            />-->
+<!--        </td>-->
+<!--        <td><font class="font_order"></font></td>-->
+<!--        <td><font class="font_deleted_{{deleted}} chk_deleted_{{id}}">{{deleted}}</font></td>-->
+<!--        <td class="cursor_pointer" onclick="location.href='/dkeyword/admin_detail/{{id}}';">-->
+<!--            {{keyword}}-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            {{createdAt}} / {{modifiedAt}}-->
+<!--            <div class="hide">-->
+<!--                <input class="input_cursor_createdAt" value="{{createdAt}}"/>-->
+<!--                <input class="input_cursor_keyword" value="{{keyword}}"/>-->
+<!--            </div>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--    {{/resultData_dkeyword}}-->
+<!--</script>-->
+
+<!--<script type="text/javascript">-->
+<!--    var list_info_dkeyword = $("#list_info_dkeyword").html();-->
+<!--    var list_info_dkeyword_template = Handlebars.compile(list_info_dkeyword);-->
+<!--</script>-->
+
+<!--<div class="container-fluid">-->
+<!--    <div class="row mt-3 mb-3">-->
+<!--        <div class="col">-->
+<!--            <h2>키워드 목록</h2>-->
+<!--            <ol class="breadcrumb">-->
+<!--                <li class="breadcrumb-item"><a href="/admin">Home</a></li>-->
+<!--                <li class="breadcrumb-item"><a href="/dkeyword/admin_list">커뮤니티 관리</a></li>-->
+<!--                <li class="breadcrumb-item active" aria-current="page">키워드 목록</li>-->
+<!--            </ol>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; 검색 영역 &ndash;&gt;-->
+<!--    <div class="row">-->
+<!--        <div class="col-lg-12">-->
+<!--            <div class="ibox-content" style="padding-bottom:0.1px;">-->
+<!--                <input type="hidden" id="input_keyword_changed" value="0" />-->
+<!--                <div class="form-group row">-->
+<!--                    <label class="col-sm-2 col-form-label">삭제여부</label>-->
+<!--                    <div class="col-sm-4">-->
+<!--                        <select class="select_search_keyword form-control" keyword="deleted" id="search_dkeyword_deleted" onchange="listener_keyword_changed()">-->
+<!--                            <option value="" selected="selected">전체</option>-->
+<!--                            <option value="false">일반</option>-->
+<!--                            <option value="true">삭제</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                    <label class="col-sm-2 col-form-label">등록 시기</label>-->
+<!--                    <div class="col-sm-2">-->
+<!--                        <input class="form-control" id="search_sdate" type="date" onchange="listener_keyword_changed()"/>-->
+<!--                    </div>-->
+<!--                    <div class="col-sm-2">-->
+<!--                        <input class="form-control" id="search_fdate" type="date" onchange="listener_keyword_changed()"/>-->
+<!--                    </div>-->
+<!--                    <div class="col-sm-2 text-right">-->
+<!--                        <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('null'); return false;">초기화</button>-->
+<!--                        <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('today'); return false;">오늘</button>-->
+<!--                        <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('week'); return false;">1주</button>-->
+<!--                        <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('month'); return false;">1개월</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="form-group row">-->
+<!--                    <label class="col-sm-2 col-form-label">키워드</label>-->
+<!--                    <div class="col-sm-4">-->
+<!--                        &lt;!&ndash; 검색 키워드 select (확장용) &ndash;&gt;-->
+<!--                        <select class="form-control" id="search_keyword" onchange="set_search_keyword()">-->
+<!--                            <option value="10" selected="selected">키워드</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                    <div class="col-sm-6">-->
+<!--                        <input-->
+<!--                                id="search_dkeyword_keyword"-->
+<!--                                onchange="listener_keyword_changed();"-->
+<!--                                class="form-control search_keyword_each search_keyword_each_10"-->
+<!--                                type="text"-->
+<!--                                placeholder="내용을 입력하세요"-->
+<!--                        />-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="form-group row">-->
+<!--                    <label class="col-sm-2 col-form-label">검색 기준</label>-->
+<!--                    <div class="col-sm-2">-->
+<!--                        <select class="form-control" id="search_orderby" onchange="listener_keyword_changed();">-->
+<!--                            <option value="created_at" selected="selected">등록순</option>-->
+<!--                            <option value="keyword">키워드순</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+
+<!--                    <label class="col-sm-2 col-form-label">한번에 불러올 갯수</label>-->
+<!--                    <div class="col-sm-2">-->
+<!--                        <select class="form-control" id="search_perpage" onchange="listener_keyword_changed();">-->
+<!--                            <option value="10" selected="selected">10</option>-->
+<!--                            <option value="50">50</option>-->
+<!--                            <option value="100">100</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+
+<!--                    <label class="col-sm-2 col-form-label">조회방향</label>-->
+<!--                    <div class="col-sm-2">-->
+<!--                        <select class="form-control" id="search_orderway" onchange="listener_keyword_changed();">-->
+<!--                            <option value="desc" selected="selected">역방향</option>-->
+<!--                            <option value="asc">정방향</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; 현재 페이지, 총 아이템 수, 총 페이지 수 보관 &ndash;&gt;-->
+<!--                <input type="hidden" id="search_callpage" value="1"/>-->
+<!--                <input type="hidden" id="info_total_itemcount" value="0"/>-->
+<!--                <input type="hidden" id="info_total_pagecount" value="0"/>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; 목록 영역 &ndash;&gt;-->
+<!--    <div class="ibox" style="padding-bottom: 50px;">-->
+<!--        <div class="ibox-content">-->
+<!--            <table class="table table-bordered">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>-->
+<!--                        <input-->
+<!--                                class="input_chk_delete_all"-->
+<!--                                type="checkbox"-->
+<!--                                keyword="all"-->
+<!--                                id="input_chk_delete_all"-->
+<!--                                onclick="listener_chk_delete(this)"-->
+<!--                        />-->
+<!--                    </th>-->
+<!--                    <th>#</th>-->
+<!--                    <th>삭제여부</th>-->
+<!--                    <th>키워드</th>-->
+<!--                    <th>입력일시/수정일시</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody id="tbody_dkeyword_list">-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--            <table style="width:100%">-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <button class="btn btn-danger btn-sm" onclick="delete_dkeyword()">일괄삭제</button>-->
+<!--                    </td>-->
+<!--                    <td id="div_page_number">-->
+<!--                        &lt;!&ndash; 페이징 번호 표시할 영역 (필요하면 구현) &ndash;&gt;-->
+<!--                    </td>-->
+<!--                    <td style="text-align: right;">-->
+<!--                        <button class="btn btn-default btn-sm" onclick="location.href='/dkeyword/admin_create'">추가하기</button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash; 자바스크립트 로직 &ndash;&gt;-->
+<!--<script>-->
+<!--    /**-->
+<!--     * 체크박스(전체선택/개별선택) 처리-->
+<!--     */-->
+<!--    function listener_chk_delete(obj) {-->
+<!--        // 전체선택 클릭 시-->
+<!--        if ($(obj).attr("keyword") === "all") {-->
+<!--            if ($(obj).prop("checked")) {-->
+<!--                $(".input_chk_delete_each").prop("checked", true);-->
+<!--            } else {-->
+<!--                $(".input_chk_delete_each").prop("checked", false);-->
+<!--            }-->
+<!--        } else {-->
+<!--            // 개별 선택: 모두 체크되었다면 전체선택도 체크-->
+<!--            if ($(".input_chk_delete_each:checked").length === $(".input_chk_delete_each").length) {-->
+<!--                $("#input_chk_delete_all").prop("checked", true);-->
+<!--            } else {-->
+<!--                $("#input_chk_delete_all").prop("checked", false);-->
+<!--            }-->
+<!--        }-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 선택된 체크박스들의 ID 리스트 반환-->
+<!--     */-->
+<!--    function listenerGetDeleteid() {-->
+<!--        let arr = [];-->
+<!--        $(".input_chk_delete_each:checked").each(function() {-->
+<!--            arr.push(Number($(this).attr("keyword")));-->
+<!--        });-->
+<!--        return arr;-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 검색 조건 변경 시-->
+<!--     */-->
+<!--    function listener_keyword_changed(){-->
+<!--        $("#input_keyword_changed").val("1");-->
+<!--        // 검색 페이지 1로 초기화-->
+<!--        $("#search_callpage").val("1");-->
+<!--        search_dkeyword();-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 페이지 번호 직접 이동 시 (페이징 구현용)-->
+<!--     */-->
+<!--    function listener_callpage(obj_num){-->
+<!--        $("#search_callpage").val(obj_num);-->
+<!--        search_dkeyword();-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 실제 dkeyword 목록 조회-->
+<!--     */-->
+<!--    function search_dkeyword() {-->
+<!--        let dkeyword_deleted = null;-->
+<!--        if ($("#search_dkeyword_deleted").val() !== "") {-->
+<!--            dkeyword_deleted = ($("#search_dkeyword_deleted").val() === "true");-->
+<!--        }-->
+
+<!--        $.ajax({-->
+<!--            // **절대 경로**로 수정-->
+<!--            url: "http://localhost:8080/api/dkeyword/plist",-->
+<!--            type: "GET",-->
+<!--            contentType : 'application/json; charset=utf-8',-->
+<!--            data: {-->
+<!--                perpage : $("#search_perpage").val(),-->
+<!--                callpage : $("#search_callpage").val(),-->
+<!--                orderby : $("#search_orderby").val(),-->
+<!--                orderway : $("#search_orderway").val(),-->
+<!--                sdate : $("#search_sdate").val(),-->
+<!--                fdate : $("#search_fdate").val(),-->
+<!--                deleted : dkeyword_deleted,-->
+<!--                keyword : $("#search_dkeyword_keyword").val()-->
+<!--            },-->
+<!--            cache: false,-->
+<!--            success: (obj_data, status, xhr)=>{-->
+<!--                // tbody 비우기-->
+<!--                $("#tbody_dkeyword_list").empty();-->
+
+<!--                // 페이징 관련 값 세팅-->
+<!--                $("#info_total_itemcount").val(obj_data["itemcount"]);-->
+<!--                $("#info_total_pagecount").val(obj_data["pagecount"]);-->
+<!--                $("#search_callpage").val(obj_data["callpage"]);-->
+
+<!--                // 목록 뿌리기-->
+<!--                let tempList = obj_data["list"] || [];-->
+<!--                if (tempList.length > 0) {-->
+<!--                    let html = list_info_dkeyword_template({"resultData_dkeyword": tempList});-->
+<!--                    $("#tbody_dkeyword_list").append(html);-->
+<!--                }-->
+
+<!--                // 순번 채우기-->
+<!--                let tempOrder = (Number(obj_data["callpage"]) - 1) * Number($("#search_perpage").val());-->
+<!--                let font_order = $(".font_order");-->
+<!--                for (let i = 0; i < font_order.length; i++) {-->
+<!--                    $(font_order[i]).text(++tempOrder);-->
+<!--                }-->
+<!--            },-->
+<!--            error: (obj_data, status, xhr)=>{-->
+<!--                alert("데이터를 가져오는 중 문제가 발생했습니다.");-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 일괄 삭제-->
+<!--     */-->
+<!--    function delete_dkeyword(){-->
+<!--        if (!confirm("정말 삭제하시겠습니까?")) {-->
+<!--            alert("취소하였습니다.");-->
+<!--            return false;-->
+<!--        }-->
+<!--        let idArr = listenerGetDeleteid();-->
+<!--        if (idArr.length === 0) {-->
+<!--            alert("선택된 항목이 없습니다.");-->
+<!--            return false;-->
+<!--        }-->
+<!--        $.ajax({-->
+<!--            // **절대 경로**로 수정-->
+<!--            url: "http://localhost:8080/api/dkeyword/list",-->
+<!--            type: "DELETE",-->
+<!--            contentType: "application/json; charset=utf-8",-->
+<!--            data: JSON.stringify({ ids: idArr }),-->
+<!--            success: function(obj_data, obj_status, obj_xhr){-->
+<!--                alert("삭제가 완료되었습니다.");-->
+<!--                search_dkeyword();-->
+<!--            },-->
+<!--            error: function(obj_data, obj_status, obj_xhr){-->
+<!--                alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 날짜 선택 초기화/오늘/1주/1개월-->
+<!--     */-->
+<!--    function set_search_sdatefdate(type) {-->
+<!--        let today = new Date();-->
+<!--        let fdate = document.getElementById("search_fdate");-->
+<!--        let sdate = document.getElementById("search_sdate");-->
+
+<!--        // 날짜를 yyyy-MM-dd 형태로 반환하는 헬퍼-->
+<!--        function formatDate(date) {-->
+<!--            let yyyy = date.getFullYear();-->
+<!--            let mm = ("0" + (date.getMonth() + 1)).slice(-2);-->
+<!--            let dd = ("0" + date.getDate()).slice(-2);-->
+<!--            return yyyy + "-" + mm + "-" + dd;-->
+<!--        }-->
+
+<!--        if (type === "null") {-->
+<!--            sdate.value = "";-->
+<!--            fdate.value = "";-->
+<!--        } else if (type === "today") {-->
+<!--            let formatted = formatDate(today);-->
+<!--            sdate.value = formatted;-->
+<!--            fdate.value = formatted;-->
+<!--        } else if (type === "week") {-->
+<!--            let weekAgo = new Date();-->
+<!--            weekAgo.setDate(today.getDate() - 7);-->
+<!--            sdate.value = formatDate(weekAgo);-->
+<!--            fdate.value = formatDate(today);-->
+<!--        } else if (type === "month") {-->
+<!--            let monthAgo = new Date();-->
+<!--            monthAgo.setMonth(today.getMonth() - 1);-->
+<!--            sdate.value = formatDate(monthAgo);-->
+<!--            fdate.value = formatDate(today);-->
+<!--        }-->
+
+<!--        // 변경되었으므로 검색 실행-->
+<!--        listener_keyword_changed();-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 검색 키워드 select 변경 시 (확장 가능)-->
+<!--     */-->
+<!--    function set_search_keyword(){-->
+<!--        listener_keyword_changed();-->
+<!--    }-->
+
+<!--    /**-->
+<!--     * 페이지 로드 시 자동 조회-->
+<!--     */-->
+<!--    $(document).ready(function() {-->
+<!--        search_dkeyword();-->
+<!--    });-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <head th:replace="~{@{includes/admin/head}}"></head>
+    <meta charset="UTF-8">
+    <title>키워드 목록</title>
+
+    <!-- Bootstrap, jQuery, Handlebars (CDN 예시) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
+
+    <style>
+        .cursor_pointer { cursor: pointer; }
+        .hide { display: none; }
+    </style>
 </head>
 <body>
 
-<script id="list_info_notice" type="text/x-handlebars-template">
-    {{#resultData_notice}}
-    <tr class="gradeA">
+<!-- Handlebars 템플릿 -->
+<script id="list_info_dkeyword" type="text/x-handlebars-template">
+    {{#each this}}
+    <tr>
         <td>
-            <input class="input_chk_delete_each" type="checkbox" keyword="{{id}}" id="input_chk_delete_each_{{id}}" onclick="listener_chk_delete(this)" />
+            <input
+                    class="input_chk_delete_each"
+                    type="checkbox"
+                    keyword="{{id}}"
+                    onclick="listener_chk_delete(this)"
+            />
         </td>
         <td><font class="font_order"></font></td>
-        <td><font class="font_deleted_{{deleted}} chk_deleted_{{id}}">{{deleted}}</font></td>
-        <td class="cursor_pointer" onclick="location.href='/notice/admin_detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
-            <div class="hide">
-                <input class="input_cursor_createdAt" value="{{createdAt}}"/>
-                <input class="input_cursor_title" value="{{title}}"/>
-            </div>
+        <td>{{deleted}}</td>
+        <td class="cursor_pointer" onclick="location.href='/dkeyword/admin_detail/{{id}}';">
+            {{keyword}}
+        </td>
+        <td>
+            {{createdAt}} / {{modifiedAt}}
         </td>
     </tr>
-    {{/resultData_notice}}
+    {{/each}}
 </script>
+
 <script type="text/javascript">
-    var list_info_notice = $("#list_info_notice").html();
-    var list_info_notice_template = Handlebars.compile(list_info_notice);
+    // 컴파일된 템플릿
+    var list_info_dkeyword_source = document.getElementById("list_info_dkeyword").innerHTML;
+    var list_info_dkeyword_template = Handlebars.compile(list_info_dkeyword_source);
 </script>
 
-<div id="wrapper">
-    <body th:replace="~{@{includes/admin/nav}}"></body>
-    <script>
-        $(".sidemenu_li_notice").addClass("active");
-    </script>
-    <div id="page-wrapper" class="gray-bg dashbard-1">
-        <body th:replace="~{@{includes/admin/navbar_top}}"></body>
-        <div class="row wrapper border-bottom white-bg page-heading">
-            <div class="col-lg-10">
-                <h2>공지사항 목록</h2>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/admin">Home</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="/notice/admin_list">커뮤니티 관리</a>
-                    </li>
-                    <li class="breadcrumb-item active">
-                        <strong>공지사항 목록</strong>
-                    </li>
-                </ol>
-            </div>
-            <div class="col-lg-2">
-            </div>
+<div class="container-fluid mt-4">
+    <h2>키워드 목록</h2>
+    <hr>
+
+    <!-- 목록 영역 -->
+    <div class="card">
+        <div class="card-header">
+            <button class="btn btn-danger btn-sm" onclick="delete_dkeyword()">일괄삭제</button>
+            <button class="btn btn-primary btn-sm float-right" onclick="location.href='/dkeyword/admin_create'">추가하기</button>
         </div>
-
-        <div class="animated fadeInRight" style="padding-top:12.5px;padding-bottom:0px;">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="ibox-content" style="padding-bottom:0.1px;">
-                        <input type="hidden" id="input_keyword_changed" value="0" />
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">삭제여부</label>
-                            <div class="col-sm-4">
-                                <select class="select_search_keyword form-control m-b" keyword="deleted" id="search_notice_deleted" onchange="listener_keyword_changed()">
-                                    <option value="" selected="selected">전체</option>
-                                    <option value="false">일반</option>
-                                    <option value="true">삭제</option>
-                                </select>
-                            </div>
-                            <label class="col-sm-6 col-form-label"></label>
-                            <label class="col-sm-2 col-form-label">등록 시기</label>
-                            <div class="col-sm-3">
-                                <input class="form-control" id="search_sdate" type="date" onchange="listener_keyword_changed()"/>
-                            </div>
-                            <div class="col-sm-3">
-                                <input class="form-control" id="search_fdate" type="date" onchange="listener_keyword_changed()"/>
-                            </div>
-                            <div class="col-sm-4">
-                                <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('null'); return false;">초기화</button>
-                                <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('today'); return false;">오늘</button>
-                                <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('week'); return false;">1주</button>
-                                <button class="btn btn-default btn-sm" onclick="set_search_sdatefdate('month'); return false;">1개월</button>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">키워드</label>
-                            <div class="col-sm-4">
-                                <select class="form-control m-b" id="search_keyword" onchange="set_search_keyword()">
-                                    <option value="10" selected="selected">제목</option>
-                                    <!--<option value="20">전화번호</option>-->
-                                </select>
-                            </div>
-                            <div class="col-sm-6">
-                                <input id="search_notice_title" onchange="listener_keyword_changed();" class="form-control search_keyword_each search_keyword_each_10" type="text" placeholder="내용을 입력하세요"/>
-                                <!--<input id="search_notice_phone" onchange="listener_keyword_changed();" class="form-control search_keyword_each search_keyword_each_20 hide" type="text" placeholder="내용을 입력하세요"/>-->
-                            </div>
-
-                            <input type="hidden" id="cursor" />
-                            <label class="col-sm-2 col-form-label">검색 기준</label>
-                            <div class="col-sm-2">
-                                <select class="form-control" id="search_orderby" onchange="listener_keyword_changed();">
-                                    <option value="created_at" selected="selected">등록순</option>
-                                    <option value="name">이름순</option>
-                                </select>
-                            </div>
-                            <label class="col-sm-2 col-form-label">한번에 불러올 갯수</label>
-                            <div class="col-sm-2">
-                                <select class="form-control" id="search_perpage" onchange="listener_keyword_changed();">
-                                    <option value="10" selected="selected">10</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                            <label class="col-sm-2 col-form-label">조회방향</label>
-                            <div class="col-sm-2">
-                                <select class="form-control" id="search_orderway" onchange="listener_keyword_changed();">
-                                    <option value="desc" selected="selected">역방향</option>
-                                    <option value="asc">정방향</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="card-body p-2">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" id="input_chk_delete_all" onclick="listener_chk_delete(this)" keyword="all" /></th>
+                    <th>#</th>
+                    <th>삭제여부</th>
+                    <th>키워드</th>
+                    <th>입력일시 / 수정일시</th>
+                </tr>
+                </thead>
+                <tbody id="tbody_dkeyword_list">
+                <!-- Handlebars 렌더링 -->
+                </tbody>
+            </table>
         </div>
-        <div class="ibox" style="padding-bottom: 50px;">
-            <div class="ibox-content">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>
-                            <input class="input_chk_delete_all" type="checkbox" keyword="all" id="input_chk_delete_all" onclick="listener_chk_delete(this)" />
-                        </th>
-                        <th>#</th>
-                        <th>삭제여부</th>
-                        <th>제목</th>
-                        <th>입력일시/수정일시</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tbody_notice_list">
-                    </tbody>
-                </table>
-                <table style="width:100%">
-                    <tr>
-                        <td>
-                            <button class="btn btn-danger btn-sm" onclick="delete_notice()">일괄삭제</button>
-                        </td>
-                        <td id="div_page_number">
-                        </td>
-                        <td style="text-align: right;">
-                            <button class="btn btn-default btn-sm" onclick="location.href='/notice/admin_create'">추가하기</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <script>
-            function delete_notice(){
-                if (confirm("정말 삭제하시겠습니까?")) {
-                } else {
-                    alert("취소");
-                    return false;
-                }
-                let ids = listenerGetDeleteIds();
-                let _data = new Map();
-                _data.url = "/api/notice/list";
-                _data.type = "DELETE";
-                _data.param = {
-                    'ids' : ids
-                };
-                _data.success = function(obj_data, obj_status, obj_xhr){
-                    search_notice();
-                }
-                _data.error = function(obj_data, obj_status, obj_xhr){
-                    alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
-                }
-                func_ajax(_data);
-            }
-        </script>
-        <script>
-            $( document ).ready(function() {
-                console.log( "ready!" );
-                search_notice();
-            });
-        </script>
-
-        <script>
-            function listener_keyword_changed(){
-                $("#input_keyword_changed").val("1");
-                search_notice();
-            }
-            function listener_callpage(obj_num){
-                $("#search_callpage").val(obj_num);
-                search_notice();
-            }
-            function search_notice() {
-                let notice_deleted = null;
-                if($("#search_notice_deleted").val() !== ""){
-                    notice_deleted = ($("#search_notice_deleted").val() === "true");
-                }
-                $.ajax({
-                    url: "/api/notice/plist",
-                    type: "GET",
-                    contentType : 'application/json; charset=utf-8',
-                    data: {
-                        perpage : $("#search_perpage").val()
-                        , callpage : $("#search_callpage").val()
-                        , orderby : $("#search_orderby").val()
-                        , orderway : $("#search_orderway").val()
-
-                        , sdate : $("#search_sdate").val()
-                        , fdate : $("#search_fdate").val()
-
-                        , deleted : notice_deleted
-                        , title : $("#search_notice_title").val()
-                    },
-                    cache: false,
-                    success: (obj_data, status, xhr)=>{
-                        $("#tbody_notice_list").html("");
-                        $("#div_page_number").html("");
-                        let tempList = obj_data["list"];
-                        for(let each of tempList){
-                            let tList = [];
-                            tList.push(each);
-                            $("#tbody_notice_list").append(list_info_notice_template({"resultData_notice":tList}));
-                        }
-                        $("#info_total_itemcount").val(obj_data["itemcount"]);
-                        $("#info_total_pagecount").val(obj_data["pagecount"]);
-                        $("#search_callpage").val(obj_data["callpage"]);
-
-                        //alert(JSON.stringify(obj_data));
-                        let tempOrder = (Number(obj_data["callpage"]) - 1) * Number($("#search_perpage").val());
-                        let font_order = $(".font_order");
-                        for(let each of font_order){
-                            $(each).text(++tempOrder);
-                        }
-
-                        let select_search_keyword = $(".select_search_keyword");
-                        for (let t = 0; t < select_search_keyword.length; t++) {
-                            //search_deleted
-                            let select_temp_name = $(select_search_keyword[t]).attr("keyword"); //deleted
-                            let option_temps = $(select_search_keyword[t]).find("option"); // <option value="false">일반</option>
-                            for(let i=0;i<option_temps.length;i++){
-                                let a_html = $(option_temps[i]).html(); //일반
-                                let a_value = $(option_temps[i]).attr("value"); //false
-                                $(".font_"+ select_temp_name +"_" + a_value).html(a_html);
-                            }
-                        }
-
-                        let callpage = obj_data["callpage"];
-                        //가장 앞 페이지로 긴급 이동
-                        $("#div_page_number").append(
-                            "<a href='javascript:listener_callpage(1)'>&lt;&lt;</a> &nbsp; &nbsp;"
-                        );
-                        //현재 페이지 보다 앞페이지로 이동 하는 부분
-                        for(let i=0;i<3;i++){
-                            let tempPage = callpage - 3 + i;
-                            if(tempPage > 0){
-                                $("#div_page_number").append(
-                                    "<a href='javascript:listener_callpage("+tempPage+")'>"+tempPage+"</a> &nbsp; &nbsp;"
-                                );
-                            }
-                        }
-
-                        $("#div_page_number").append(
-                            "<a href='javascript:listener_callpage("+callpage+")'>"+callpage+"</a> &nbsp; &nbsp;"
-                        );
-
-                        //현재 페이지 보다 뒤페이지로 이동 하는 부분
-                        for(let i=0;i<3;i++){
-                            let tempPage = callpage + 1 + i;
-                            if(tempPage <= obj_data["pagecount"]){
-                                $("#div_page_number").append(
-                                    "<a href='javascript:listener_callpage("+tempPage+")'>"+tempPage+"</a> &nbsp; &nbsp;"
-                                );
-                            }
-                        }
-
-                        $("#div_page_number").append(
-                            "<a href='javascript:listener_callpage("+obj_data["pagecount"]+")'>&gt;&gt;</a> &nbsp; &nbsp;"
-                        );
-
-                        /*
-                        << 12 13 14 15 '16' 17 18 19 20 >>
-                        * */
-
-
-                    },
-                    error: (obj_data, status, xhr)=>{
-                        alert("error!!");
-                        alert(JSON.stringify(obj_data));
-                    }
-                });
-            }
-        </script>
-
-
-        <body th:replace="~{@{includes/admin/footer}}"></body>
     </div>
-    <body th:replace="~{@{includes/admin/right_sidebar}}"></body>
 </div>
-<body th:replace="~{@{includes/admin/bottom}}"></body>
+
+<script>
+    /**
+     * 목록 불러오기 (파라미터 없이 고정 URL)
+     */
+    function search_dkeyword() {
+        $.ajax({
+            url: "http://localhost:8080/api/dkeyword/plist?perpage=10&orderby=created_at&orderway=sec",
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                /*
+                  data가 배열 형태라고 가정:
+                  예: [
+                    { "id": 1, "deleted": false, "createdAt": "...", "modifiedAt": "...", "keyword": "..." },
+                    ...
+                  ]
+                */
+                // 테이블 비우기
+                $("#tbody_dkeyword_list").empty();
+
+                // Handlebars로 데이터 템플릿
+                let html = list_info_dkeyword_template(data);
+                $("#tbody_dkeyword_list").append(html);
+
+                // 순번 매기기
+                let order = 1;
+                $(".font_order").each(function() {
+                    $(this).text(order++);
+                });
+            },
+            error: function(xhr) {
+                alert("목록을 가져오는 중 오류가 발생했습니다.");
+            }
+        });
+    }
+
+    /**
+     * 체크박스 전체선택 or 개별선택
+     */
+    function listener_chk_delete(obj) {
+        let isAll = $(obj).attr("keyword") === "all";
+        if (isAll) {
+            // 전체선택 체크박스
+            let checked = $(obj).prop("checked");
+            $(".input_chk_delete_each").prop("checked", checked);
+        } else {
+            // 개별 체크 시 전체선택 체크
+            if ($(".input_chk_delete_each:checked").length === $(".input_chk_delete_each").length) {
+                $("#input_chk_delete_all").prop("checked", true);
+            } else {
+                $("#input_chk_delete_all").prop("checked", false);
+            }
+        }
+    }
+
+    /**
+     * 체크된 항목 ID 배열 반환
+     */
+    function getCheckedIds() {
+        let ids = [];
+        $(".input_chk_delete_each:checked").each(function() {
+            ids.push(Number($(this).attr("keyword")));
+        });
+        return ids;
+    }
+
+    /**
+     * 일괄 삭제
+     */
+    function delete_dkeyword() {
+        let checkedIds = getCheckedIds();
+        if (checkedIds.length === 0) {
+            alert("삭제할 항목을 선택하세요.");
+            return;
+        }
+        if(!confirm("정말 삭제하시겠습니까?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "http://localhost:8080/api/dkeyword/list",
+            type: "DELETE",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ ids: checkedIds }),
+            success: function() {
+                alert("선택된 항목이 삭제되었습니다.");
+                search_dkeyword(); // 목록 재조회
+            },
+            error: function() {
+                alert("삭제 요청 중 오류가 발생했습니다.");
+            }
+        });
+    }
+
+    /** 페이지 로딩 시 자동 실행 */
+    $(document).ready(function() {
+        search_dkeyword();
+    });
+</script>
+
 </body>
 </html>

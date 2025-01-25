@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Entity
 public class Dkeyword extends AuditingFields{
-    @Setter @Column(nullable=false)
+    @Setter @Column(nullable=false, unique = true)
     String keyword;
 
     protected Dkeyword(){}

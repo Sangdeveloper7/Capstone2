@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.fallsprbasic.mapper.DocumentMapper">
+
+	<!---->
+
+	<select id="detail" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DocumentDto$DetailResDto">
+		SELECT document.id,
+			   document.keyword_id AS keywordId,
+			   document.deleted,
+			   document.created_at AS createdAt,
+			   document.modified_at AS modifiedAt,
+			   document.doc_name AS docName,
+			   document.doc_content AS docContent,
+			   document.doc_url AS docUrl,
+			   document.prepare
+		FROM document
+		WHERE document.id = #{id}
+	</select>
+
+	<select id="list" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DocumentDto$DetailResDto">
+		SELECT document.id,
+		document.keyword_id AS keywordId,
+		document.doc_name AS docName
+		FROM document
+		WHERE document.id IS NOT NULL
+		<if test="deleted != null">AND document.deleted = #{deleted}</if>
+		<if test="sdate != null">AND document.created_at &gt;= CONCAT(#{sdate}, ' 00:00:00')</if>
+		<if test="fdate != null">AND document.created_at &lt;= CONCAT(#{fdate}, ' 23:59:59')</if>
+		<if test="docName != null">AND document.doc_name LIKE CONCAT('%', #{docName}, '%')</if>
+	</select>
+
+	<select id="pagedList" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DocumentDto$DetailResDto">
+		SELECT document.id,
+		document.keyword_id AS keywordId,
+		document.doc_name AS docName,
+		document.created_at AS createdAt
+		FROM document
+		WHERE document.id IS NOT NULL
+		<if test="deleted != null">AND document.deleted = #{deleted}</if>
+		<if test="sdate != null">AND document.created_at &gt;= CONCAT(#{sdate}, ' 00:00:00')</if>
+		<if test="fdate != null">AND document.created_at &lt;= CONCAT(#{fdate}, ' 23:59:59')</if>
+		<if test="docName != null">AND document.doc_name LIKE CONCAT('%', #{docName}, '%')</if>
+		ORDER BY
+		<choose>
+			<when test="orderby == 'created_at'">document.created_at</when>
+			<when test="orderby == 'docName'">document.doc_name</when>
+			<otherwise>document.id</otherwise>
+		</choose>
+		<if test="orderway == 'desc'">DESC</if>
+		<if test="orderway == 'asc'">ASC</if>
+		LIMIT #{offset}, #{perpage}
+	</select>
+
+	<select id="scrollList" parameterType="hashMap" resultType="com.thc.fallsprbasic.dto.DocumentDto$DetailResDto">
+		SELECT document.id
+		FROM document
+		WHERE document.id is not NULL
+		<if test = "deleted != null">AND document.deleted = #{deleted}</if>
+		<if test = "sdate != null and sdate !=''">AND document.created_at >= CONCAT(#{sdate}, ' 00:00:00.000000')</if>
+		<if test = "fdate != null and fdate !=''">AND CONCAT(#{fdate}, ' 23:59:59.999999') >= document.created_at</if>
+		<if test = "ocument != null and ocument !=''">AND document.ocument LIKE CONCAT('%', #{ocument}, '%')</if>
+		<if test = "orderway != null and orderway =='desc'">
+			<if test = "createdAt != null and createdAt !=''">AND #{createdAt} > document.created_at</if>
+			ORDER BY document.created_at DESC
+		</if>
+		<if test = "orderway != null and orderway =='asc'">
+			<if test = "createdAt != null and createdAt !=''">AND document.created_at > #{createdAt}</if>
+			ORDER BY document.created_at ASC
+		</if>
+		LIMIT 0, #{perpage}
+	</select>
+
+</mapper>

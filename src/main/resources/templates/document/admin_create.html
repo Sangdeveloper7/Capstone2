@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <head th:replace="~{@{includes/admin/head}}"></head>
+</head>
+<body>
+
+<div id="wrapper">
+    <body th:replace="~{@{includes/admin/nav}}"></body>
+    <script>
+        $(".sidemenu_li_keyword").addClass("active");
+    </script>
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <body th:replace="~{@{includes/admin/navbar_top}}"></body>
+        <div class="row wrapper border-bottom white-bg page-heading">
+            <div class="col-lg-10">
+                <h2>키워드 및 문서 신규</h2>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/admin">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/keyword/admin_list">키워드 관리</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/keyword/admin_list">키워드 목록</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        <strong>키워드 및 문서 신규</strong>
+                    </li>
+                </ol>
+            </div>
+            <div class="col-lg-2">
+            </div>
+        </div>
+
+        <div class="animated fadeInRight" style="padding-top:12.5px;padding-bottom:0px;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox-title">
+                        <h5>신규 등록</h5>
+                    </div>
+                    <div class="ibox-content" style="padding-bottom:0.1px;">
+
+                        <!-- 키워드 -->
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">*키워드아아디</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="input_required form-control m-b" id="create_keywordId" placeholder="키워드를 입력해주세요!" required />
+                            </div>
+                            <label class="col-sm-6"></label>
+                        </div>
+
+                        <!-- 문서 이름 -->
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">*문서 이름</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="input_required form-control m-b" id="create_docName" placeholder="문서 이름을 입력해주세요!" required />
+                            </div>
+                            <label class="col-sm-6"></label>
+                        </div>
+
+                        <!-- 문서 내용 -->
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">*문서 내용</label>
+                            <div class="col-sm-4">
+                                <textarea class="input_required form-control m-b" id="create_docContent" placeholder="문서 내용을 입력해주세요!" required></textarea>
+                            </div>
+                            <label class="col-sm-6"></label>
+                        </div>
+
+                        <!-- 준비 정보 -->
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">*준비 정보</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="input_required form-control m-b" id="create_prepare" placeholder="준비 정보를 입력해주세요!" required />
+                            </div>
+                            <label class="col-sm-6"></label>
+                        </div>
+
+                        <!-- 문서 URL -->
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">*문서 URL</label>
+                            <div class="col-sm-4">
+                                <input type="url" class="input_required form-control m-b" id="create_docUrl" placeholder="문서 URL을 입력해주세요!" required />
+                            </div>
+                            <label class="col-sm-6"></label>
+                        </div>
+
+                        <!-- 등록 버튼 -->
+                        <div class="m-b" style="text-align: right;">
+                            <button class="btn btn-primary btn-sm" onclick="createKeywordAndDocument()">등록하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                console.log("ready!");
+            });
+
+            function createKeywordAndDocument() {
+                // 필수 값 검증
+                if (
+                    !$("#create_keywordId").val() ||
+                    !$("#create_docName").val() ||
+                    !$("#create_docContent").val() ||
+                    !$("#create_prepare").val() ||
+                    !$("#create_docUrl").val()
+                ) {
+                    alert("모든 필수 항목을 입력해주세요!");
+                    return false;
+                }
+
+                // 데이터 준비
+                let _param = {
+                    keywordId: $("#create_keywordId").val(),
+                    docName: $("#create_docName").val(),
+                    docContent: $("#create_docContent").val(),
+                    prepare: $("#create_prepare").val(),
+                    docUrl: $("#create_docUrl").val()
+                };
+
+                // AJAX 요청
+                $.ajax({
+                    url: "/api/document", // 서버 API URL
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(_param),
+                    cache: false,
+                    success: function(obj_data, status, xhr) {
+                        alert("등록 성공!");
+                        console.log("Response:", obj_data);
+                    },
+                    error: function(obj_data, status, xhr) {
+                        alert("등록 실패!");
+                        console.log("Error:", obj_data);
+                    }
+                });
+            }
+        </script>
+        <body th:replace="~{@{includes/admin/footer}}"></body>
+    </div>
+    <body th:replace="~{@{includes/admin/right_sidebar}}"></body>
+</div>
+<body th:replace="~{@{includes/admin/bottom}}"></body>
+</body>
+</html>
