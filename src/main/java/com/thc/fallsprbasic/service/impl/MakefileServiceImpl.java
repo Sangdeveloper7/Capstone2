@@ -5,7 +5,9 @@ import com.thc.fallsprbasic.dto.DefaultDto;
 import com.thc.fallsprbasic.dto.MakefileDto;
 import com.thc.fallsprbasic.mapper.MakefileMapper;
 import com.thc.fallsprbasic.repository.DkeywordRepository;
+import com.thc.fallsprbasic.repository.DocumentRepository;
 import com.thc.fallsprbasic.repository.MakefileRepository;
+import com.thc.fallsprbasic.repository.UserRepository;
 import com.thc.fallsprbasic.service.MakefileService;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +20,21 @@ public class MakefileServiceImpl implements MakefileService {
     private final MakefileRepository makefileRepository;
     private final MakefileMapper makefileMapper;
     private final DkeywordRepository dkeywordRepository;
+    private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
+
     public MakefileServiceImpl(
             MakefileRepository makefileRepository
             , MakefileMapper makefileMapper
             , DkeywordRepository dkeywordRepository
-    ) {
+            , UserRepository userRepository
+            , DocumentRepository documentRepository)
+    {
         this.makefileRepository = makefileRepository;
         this.makefileMapper = makefileMapper;
         this.dkeywordRepository = dkeywordRepository;
+        this.userRepository = userRepository;
+        this.documentRepository = documentRepository;
     }
 
     @Override
@@ -33,8 +42,8 @@ public class MakefileServiceImpl implements MakefileService {
         System.out.println("create");
 
         boolean keywordExists = dkeywordRepository.existsById(param.getKeywordId());
-        boolean userIdExists = makefileRepository.existsById(param.getUserId());
-        boolean documentExists = makefileRepository.existsById(param.getDocumentId());
+        boolean userIdExists = userRepository.existsById(param.getUserId());
+        boolean documentExists = documentRepository.existsById(param.getDocumentId());
         if (!keywordExists) {
             throw new IllegalArgumentException("유효하지 않은 키워드 ID입니다: " + param.getKeywordId());
         }
@@ -57,11 +66,23 @@ public class MakefileServiceImpl implements MakefileService {
         if(param.getKeywordId() != null) {
             Makefile.setKeywordId(param.getKeywordId());
         }
+        if(param.getUserId() != null) {
+            Makefile.setUserId(param.getUserId());
+        }
         if(param.getDocName() != null) {
             Makefile.setDocName(param.getDocName());
         }
         if(param.getDocContent() != null) {
             Makefile.setDocContent(param.getDocContent());
+        }
+        if(param.getPrepare() != null) {
+            Makefile.setPrepare(param.getPrepare());
+        }
+        if(param.getDocumentId() != null) {
+            Makefile.setDocumentId(param.getDocumentId());
+        }
+        if(param.getDocUrl() != null) {
+            Makefile.setDocUrl(param.getDocUrl());
         }
         makefileRepository.save(Makefile);
     }
