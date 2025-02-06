@@ -1,11 +1,14 @@
 package com.thc.fallsprbasic.service.impl;
 
+import com.thc.fallsprbasic.Enum.RoleType;
 import com.thc.fallsprbasic.domain.User;
 import com.thc.fallsprbasic.dto.DefaultDto;
 import com.thc.fallsprbasic.dto.UserDto;
+import com.thc.fallsprbasic.exception.NoAuthorizationException;
 import com.thc.fallsprbasic.mapper.UserMapper;
 import com.thc.fallsprbasic.repository.UserRepository;
 import com.thc.fallsprbasic.service.UserService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,12 +20,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public UserServiceImpl(
             UserRepository userRepository
-            , UserMapper userMapper
-    ) {
+            , UserMapper userMapper,
+            BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -45,6 +51,15 @@ public class UserServiceImpl implements UserService {
             //return DefaultDto.CreateResDto.builder().id((long) -400).build();
             throw new RuntimeException("already exist");
         }
+
+        // 비번 암호와 코드
+        param.setPassword(bCryptPasswordEncoder.encode(param.getPassword()));
+        User newUser = userRepository.save(param.toEntity());
+
+        if(param.getRole() == RoleType.ADMIN){
+            throw new NoAuthorizationException("관리자 권한의 계정은 생성할 수 없습니다.");
+        }
+
         return userRepository.save(param.toEntity()).toCreateResDto();
     }
     @Override
@@ -59,6 +74,9 @@ public class UserServiceImpl implements UserService {
         }
         if(param.getPhone() != null) {
             user.setPhone(param.getPhone());
+        }
+        if(param.getRole() == RoleType.ADMIN){
+            throw new NoAuthorizationException("해당 메서드에 대한 권한이 없습니다. 관리자 권한만 접속 가능합니다.");
         }
         userRepository.save(user);
     }
